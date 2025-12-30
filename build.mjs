@@ -24,6 +24,9 @@ await esbuild.build({
   outfile: 'gemini-fast.mjs',
   format: 'esm',
   external: ['fsevents', 'ink'],
+  alias: {
+    'punycode': path.resolve(__dirname, 'node_modules/punycode/punycode.js'),
+  },
   plugins: [mockGeminiPlugin],
   loader: {
     '.wasm': 'binary',
