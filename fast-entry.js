@@ -46,7 +46,17 @@ import { getUserStartupWarnings } from '/opt/homebrew/lib/node_modules/@google/g
 import { ConsolePatcher } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/ConsolePatcher.js';
 // import { runNonInteractive } from './nonInteractiveCli.js'; // INLINED
 import { cleanupCheckpoints, registerCleanup, registerSyncCleanup, runExitCleanup, registerTelemetryConfig, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/cleanup.js';
-import { sessionId, logUserPrompt, AuthType, getOauthClient, UserPromptEvent, debugLogger, recordSlowRender, coreEvents, CoreEvent, createWorkingStdio, patchStdio, writeToStdout, writeToStderr, disableMouseEvents, enableMouseEvents, enterAlternateScreen, disableLineWrapping, shouldEnterAlternateScreen, startupProfiler, ExitCodes, SessionStartSource, SessionEndReason, fireSessionStartHook, fireSessionEndHook, getVersion, partListUnionToString, executeToolCall, GeminiEventType, FatalInputError, promptIdContext, OutputFormat, JsonFormatter, StreamJsonFormatter, JsonStreamEventType, uiTelemetryService } from '@google/gemini-cli-core';
+import {
+    sessionId, logUserPrompt, AuthType, getOauthClient, UserPromptEvent, debugLogger, recordSlowRender, coreEvents,
+    CoreEvent, createWorkingStdio, patchStdio, writeToStdout, writeToStderr, disableMouseEvents, enableMouseEvents,
+    enterAlternateScreen, disableLineWrapping, shouldEnterAlternateScreen, startupProfiler, ExitCodes,
+    SessionStartSource, SessionEndReason, fireSessionStartHook, fireSessionEndHook, getVersion,
+    partListUnionToString, executeToolCall, GeminiEventType, FatalInputError, promptIdContext, OutputFormat,
+    JsonFormatter, StreamJsonFormatter, JsonStreamEventType, uiTelemetryService,
+    SHELL_TOOL_NAME, EDIT_TOOL_NAME, WRITE_FILE_TOOL_NAME, WEB_FETCH_TOOL_NAME, WEB_SEARCH_TOOL_NAME, LS_TOOL_NAME,
+    READ_FILE_TOOL_NAME, GREP_TOOL_NAME, GLOB_TOOL_NAME,
+    ApprovalMode
+} from '@google/gemini-cli-core';
 import { initializeApp, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/core/initializer.js';
 import { validateAuthMethod } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/auth.js';
 // import { setMaxSizedBoxDebugging } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/components/shared/MaxSizedBox.js';
@@ -639,6 +649,36 @@ function initializeOutputListenersAndFlush() {
     coreEvents.drainBacklogs();
 }
 
+async function myLoadCliConfig(mergedSettings, sessionId, argv, cwd = process.cwd()) {
+    const config = await loadCliConfig(mergedSettings, sessionId, argv, cwd);
+
+    // Determine if we are in non-interactive mode (mirroring core logic)
+    const hasQuery = !!argv.query;
+    const interactive = !!argv.promptInteractive ||
+        !!argv.experimentalAcp ||
+        (process.stdin.isTTY && !hasQuery && !argv.prompt);
+
+    if (!interactive && config.getApprovalMode() !== ApprovalMode.YOLO) {
+        // Enhance excludeTools to include more tools that often require confirmation
+        const currentExcludes = config.excludeTools || [];
+        const extraExcludes = [
+            WEB_SEARCH_TOOL_NAME,
+            LS_TOOL_NAME,
+        ];
+
+        // Add them if not already excluded and not explicitly allowed
+        const allowedTools = new Set(argv.allowedTools || mergedSettings.tools?.allowed || []);
+        for (const tool of extraExcludes) {
+            if (!currentExcludes.includes(tool) && !allowedTools.has(tool)) {
+                currentExcludes.push(tool);
+            }
+        }
+        config.excludeTools = currentExcludes;
+    }
+
+    return config;
+}
+
 async function main() {
     const cliStartupHandle = startupProfiler.start('cli_startup');
     const cleanupStdio = patchStdio();
@@ -652,7 +692,7 @@ async function main() {
     const settings = loadSettings();
     loadSettingsHandle?.end();
     const migrateHandle = startupProfiler.start('migrate_settings');
-    migrateDeprecatedSettings(settings, 
+    migrateDeprecatedSettings(settings,
     // Temporary extension manager only used during this non-interactive UI phase.
     new ExtensionManager({
         workspaceDir: process.cwd(),
@@ -712,7 +752,7 @@ async function main() {
         // that only initializes enough config to enable refreshAuth or find
         // another way to decouple refreshAuth from requiring a config.
         if (sandboxConfig) {
-            const partialConfig = await loadCliConfig(settings.merged, sessionId, argv);
+            const partialConfig = await myLoadCliConfig(settings.merged, sessionId, argv);
             if (settings.merged.security?.auth?.selectedType &&
                 !settings.merged.security?.auth?.useExternal) {
                 // Validate authentication here because the sandbox will interfere with the Oauth2 web redirect.
@@ -767,7 +807,7 @@ async function main() {
     // may have side effects.
     {
         const loadConfigHandle = startupProfiler.start('load_cli_config');
-        const config = await loadCliConfig(settings.merged, sessionId, argv);
+        const config = await myLoadCliConfig(settings.merged, sessionId, argv);
         loadConfigHandle?.end();
         // Register config for telemetry shutdown
         // This ensures telemetry (including SessionEnd hooks) is properly flushed on exit
@@ -824,7 +864,7 @@ async function main() {
         const wasRaw = process.stdin.isRaw;
         // REMOVED INTERACTIVE UI BLOCK
         // if (config.isInteractive() && !wasRaw && process.stdin.isTTY) {
-        //     ... 
+        //     ...
         // }
 
         // setMaxSizedBoxDebugging(isDebugMode);
@@ -867,29 +907,7 @@ async function main() {
         cliStartupHandle?.end();
         // Render UI, passing necessary config values. Check that there is no command line question.
         if (config.isInteractive()) {
-            // START OF MODIFICATION
-            // Instead of starting UI, we print a warning or fallback to non-interactive if input provided, or exit.
-            // But since this is "fast-entry", we assume it's for non-interactive use cases mostly?
-            // The instructions said "remove the if (config.isInteractive()) block entirely to prevent any UI-related code from being triggered."
-            // However, we must ensure that if it IS interactive but no input is provided, we don't just crash or hang.
-            // If isInteractive is true, it usually means no input was piped and no args provided.
-            // In that case, normally the TUI starts.
-            // If we remove TUI support, we should probably tell the user.
-            
-            // However, the task is to optimize "one-shot prompts".
-            // If I remove the block:
-            // await startInteractiveUI(...)
-            // return;
-            // 
-            // It will fall through to:
-            // await config.initialize();
-            
-            // So if I simply remove the block as instructed, it will proceed to non-interactive flow.
-            // If there is no input, the later check `if (!input)` will catch it and error out.
-            // That seems acceptable for a "fast path" that is intended for one-shot prompts.
-            
-            // So I will just NOT include the block.
-            // END OF MODIFICATION
+            // ...
         }
         await config.initialize();
         startupProfiler.flush(config);
@@ -920,6 +938,13 @@ async function main() {
             await runExitCleanup();
             process.exit(ExitCodes.FATAL_INPUT_ERROR);
         }
+
+        // Add hint for non-interactive mode
+        if (!config.isInteractive() && config.getApprovalMode() !== ApprovalMode.YOLO) {
+            const hint = `\n\n[System Note: You are in one-shot non-interactive mode. Tools requiring confirmation (shell commands, web search, file edits) are disabled. Use read-only tools like ${READ_FILE_TOOL_NAME}, ${GREP_TOOL_NAME}, or ${GLOB_TOOL_NAME} to gather info.]`;
+            input += hint;
+        }
+
         const prompt_id = Math.random().toString(16).slice(2);
         logUserPrompt(config, new UserPromptEvent(input.length, prompt_id, config.getContentGeneratorConfig()?.authType, input));
         const nonInteractiveConfig = await validateNonInteractiveAuth(settings.merged.security?.auth?.selectedType, settings.merged.security?.auth?.useExternal, config, settings);
@@ -941,6 +966,7 @@ async function main() {
         process.exit(ExitCodes.SUCCESS);
     }
 }
+
 
 main().catch((err) => {
     console.error('Fatal error:', err);
