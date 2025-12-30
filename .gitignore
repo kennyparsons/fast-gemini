@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.cpuprofile
+*.log
+gemini-fast.mjs
+gemini-fast.cjs
+src_copy/
