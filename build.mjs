@@ -21,7 +21,7 @@ await esbuild.build({
   bundle: true,
   platform: 'node',
   target: 'node20',
-  outfile: 'gemini-fast.mjs',
+  outfile: 'build/gemini-fast-v3.mjs',
   format: 'esm',
   external: ['fsevents', 'ink'],
   alias: {

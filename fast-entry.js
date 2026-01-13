@@ -63,7 +63,7 @@ import { validateAuthMethod } from '/opt/homebrew/lib/node_modules/@google/gemin
 import { runZedIntegration } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/zed-integration/zedIntegration.js';
 import { cleanupExpiredSessions } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/sessionCleanup.js';
 import { validateNonInteractiveAuth } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/validateNonInterActiveAuth.js';
-import { detectAndEnableKittyProtocol } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/kittyProtocolDetector.js';
+
 import { checkForUpdates } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/updateCheck.js';
 import { handleAutoUpdate } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/handleAutoUpdate.js';
 import { appEvents, AppEvent } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/events.js';
