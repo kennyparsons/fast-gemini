@@ -62,9 +62,8 @@ jobs:
           ```
           
           ### 📋 Requirements
-          
-          - Node.js >= 18.0.0
-          - Google Gemini CLI installed (for dependencies)
+
+          - Node.js >= 18.0.0 (no other dependencies needed!)
           
           ### 📝 Changelog
           
