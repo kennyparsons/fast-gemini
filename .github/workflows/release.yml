@@ -63,7 +63,7 @@ jobs:
           
           ### 📋 Requirements
 
-          - Node.js >= 18.0.0 (no other dependencies needed!)
+          - Node.js >= 20.0.0 (no other dependencies needed!)
           
           ### 📝 Changelog
           

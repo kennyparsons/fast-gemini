@@ -23,7 +23,7 @@ curl -L -o gemini-fast.js https://github.com/kennyparsons/fast-gemini/releases/l
 node gemini-fast.js "Your prompt here"
 ```
 
-**Requirements:** Node.js >= 18.0.0
+**Requirements:** Node.js >= 20.0.0
 
 ### From Source
 
@@ -35,7 +35,7 @@ npm run build
 ```
 
 **Development Requirements:**
-- Node.js >= 18.0.0
+- Node.js >= 20.0.0
 - npm or yarn
 
 ## Usage
