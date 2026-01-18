@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.24.2](https://github.com/kennyparsons/fast-gemini/compare/fast-gemini-v0.24.1...fast-gemini-v0.24.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* add release and version badges to README ([#9](https://github.com/kennyparsons/fast-gemini/issues/9)) ([42db189](https://github.com/kennyparsons/fast-gemini/commit/42db189b2af2d0b89cb53832281e2f8286f2aaab))
+
 ## [0.24.1](https://github.com/kennyparsons/fast-gemini/compare/v0.24.0...v0.24.1) (2026-01-18)
 
 
