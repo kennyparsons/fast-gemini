@@ -31,21 +31,21 @@ const ToolCallStatus = {
 };
 
 // Imports from main gemini.js (converted to absolute paths)
-import { loadCliConfig, parseArguments } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/config.js';
-import * as cliConfig from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/config.js';
-import { readStdin } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/readStdin.js';
+import { loadCliConfig, parseArguments } from '@google/gemini-cli/dist/src/config/config.js';
+import * as cliConfig from '@google/gemini-cli/dist/src/config/config.js';
+import { readStdin } from '@google/gemini-cli/dist/src/utils/readStdin.js';
 import { basename } from 'node:path';
 import v8 from 'node:v8';
 import os from 'node:os';
 import dns from 'node:dns';
-import { start_sandbox } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/sandbox.js';
-import { loadSettings, migrateDeprecatedSettings, SettingScope, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/settings.js';
-import { themeManager } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/themes/theme-manager.js';
-import { getStartupWarnings } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/startupWarnings.js';
-import { getUserStartupWarnings } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/userStartupWarnings.js';
-import { ConsolePatcher } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/ConsolePatcher.js';
+import { start_sandbox } from '@google/gemini-cli/dist/src/utils/sandbox.js';
+import { loadSettings, SettingScope, } from '@google/gemini-cli/dist/src/config/settings.js';
+import { themeManager } from '@google/gemini-cli/dist/src/ui/themes/theme-manager.js';
+import { getStartupWarnings } from '@google/gemini-cli/dist/src/utils/startupWarnings.js';
+import { getUserStartupWarnings } from '@google/gemini-cli/dist/src/utils/userStartupWarnings.js';
+import { ConsolePatcher } from '@google/gemini-cli/dist/src/ui/utils/ConsolePatcher.js';
 // import { runNonInteractive } from './nonInteractiveCli.js'; // INLINED
-import { cleanupCheckpoints, registerCleanup, registerSyncCleanup, runExitCleanup, registerTelemetryConfig, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/cleanup.js';
+import { cleanupCheckpoints, registerCleanup, registerSyncCleanup, runExitCleanup, registerTelemetryConfig, } from '@google/gemini-cli/dist/src/utils/cleanup.js';
 import {
     sessionId, logUserPrompt, AuthType, getOauthClient, UserPromptEvent, debugLogger, recordSlowRender, coreEvents,
     CoreEvent, createWorkingStdio, patchStdio, writeToStdout, writeToStderr, disableMouseEvents, enableMouseEvents,
@@ -57,31 +57,31 @@ import {
     READ_FILE_TOOL_NAME, GREP_TOOL_NAME, GLOB_TOOL_NAME,
     ApprovalMode
 } from '@google/gemini-cli-core';
-import { initializeApp, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/core/initializer.js';
-import { validateAuthMethod } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/auth.js';
-// import { setMaxSizedBoxDebugging } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/components/shared/MaxSizedBox.js';
-import { runZedIntegration } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/zed-integration/zedIntegration.js';
-import { cleanupExpiredSessions } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/sessionCleanup.js';
-import { validateNonInteractiveAuth } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/validateNonInterActiveAuth.js';
+import { initializeApp, } from '@google/gemini-cli/dist/src/core/initializer.js';
+import { validateAuthMethod } from '@google/gemini-cli/dist/src/config/auth.js';
+// import { setMaxSizedBoxDebugging } from '@google/gemini-cli/dist/src/ui/components/shared/MaxSizedBox.js';
+import { runZedIntegration } from '@google/gemini-cli/dist/src/zed-integration/zedIntegration.js';
+import { cleanupExpiredSessions } from '@google/gemini-cli/dist/src/utils/sessionCleanup.js';
+import { validateNonInteractiveAuth } from '@google/gemini-cli/dist/src/validateNonInterActiveAuth.js';
 
-import { checkForUpdates } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/updateCheck.js';
-import { handleAutoUpdate } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/handleAutoUpdate.js';
-import { appEvents, AppEvent } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/events.js';
-import { SessionSelector } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/sessionUtils.js';
-import { computeWindowTitle } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/windowTitle.js';
-import { relaunchAppInChildProcess, relaunchOnExitCode, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/relaunch.js';
-import { loadSandboxConfig } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/sandboxConfig.js';
-import { deleteSession, listSessions } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/sessions.js';
-import { ExtensionManager } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/extension-manager.js';
-import { createPolicyUpdater } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/policy.js';
-import { requestConsentNonInteractive } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/config/extensions/consent.js';
+import { checkForUpdates } from '@google/gemini-cli/dist/src/ui/utils/updateCheck.js';
+import { handleAutoUpdate } from '@google/gemini-cli/dist/src/utils/handleAutoUpdate.js';
+import { appEvents, AppEvent } from '@google/gemini-cli/dist/src/utils/events.js';
+import { SessionSelector } from '@google/gemini-cli/dist/src/utils/sessionUtils.js';
+import { computeWindowTitle } from '@google/gemini-cli/dist/src/utils/windowTitle.js';
+import { relaunchAppInChildProcess, relaunchOnExitCode, } from '@google/gemini-cli/dist/src/utils/relaunch.js';
+import { loadSandboxConfig } from '@google/gemini-cli/dist/src/config/sandboxConfig.js';
+import { deleteSession, listSessions } from '@google/gemini-cli/dist/src/utils/sessions.js';
+import { ExtensionManager } from '@google/gemini-cli/dist/src/config/extension-manager.js';
+import { createPolicyUpdater } from '@google/gemini-cli/dist/src/config/policy.js';
+import { requestConsentNonInteractive } from '@google/gemini-cli/dist/src/config/extensions/consent.js';
 // Imports for inlined runNonInteractive
-import { isSlashCommand } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/commandUtils.js';
+import { isSlashCommand } from '@google/gemini-cli/dist/src/ui/utils/commandUtils.js';
 import readline from 'node:readline';
-import { handleSlashCommand } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCliCommands.js';
-import { handleAtCommand } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/hooks/atCommandProcessor.js';
-import { handleError, handleToolError, handleCancellationError, handleMaxTurnsExceededError, } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/utils/errors.js';
-import { TextOutput } from '/opt/homebrew/lib/node_modules/@google/gemini-cli/dist/src/ui/utils/textOutput.js';
+import { handleSlashCommand } from '@google/gemini-cli/dist/src/nonInteractiveCliCommands.js';
+import { handleAtCommand } from '@google/gemini-cli/dist/src/ui/hooks/atCommandProcessor.js';
+import { handleError, handleToolError, handleCancellationError, handleMaxTurnsExceededError, } from '@google/gemini-cli/dist/src/utils/errors.js';
+import { TextOutput } from '@google/gemini-cli/dist/src/ui/utils/textOutput.js';
 
 
 // INLINED convertSessionToHistoryFormats
@@ -691,17 +691,18 @@ async function main() {
     const loadSettingsHandle = startupProfiler.start('load_settings');
     const settings = loadSettings();
     loadSettingsHandle?.end();
-    const migrateHandle = startupProfiler.start('migrate_settings');
-    migrateDeprecatedSettings(settings,
-    // Temporary extension manager only used during this non-interactive UI phase.
-    new ExtensionManager({
-        workspaceDir: process.cwd(),
-        settings: settings.merged,
-        enabledExtensionOverrides: [],
-        requestConsent: requestConsentNonInteractive,
-        requestSetting: null,
-    }));
-    migrateHandle?.end();
+    // Note: migrateDeprecatedSettings removed in newer versions of @google/gemini-cli
+    // const migrateHandle = startupProfiler.start('migrate_settings');
+    // migrateDeprecatedSettings(settings,
+    // // Temporary extension manager only used during this non-interactive UI phase.
+    // new ExtensionManager({
+    //     workspaceDir: process.cwd(),
+    //     settings: settings.merged,
+    //     enabledExtensionOverrides: [],
+    //     requestConsent: requestConsentNonInteractive,
+    //     requestSetting: null,
+    // }));
+    // migrateHandle?.end();
     await cleanupCheckpoints();
     const parseArgsHandle = startupProfiler.start('parse_arguments');
     const argv = await parseArguments(settings.merged);
