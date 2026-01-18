@@ -1,5 +1,10 @@
 name: CI
 
+# Required checks for PRs:
+# - Build must succeed
+# - Build output must be executable (node build/gemini-fast.js --version)
+# - Tests must pass (if GEMINI_API_KEY is set)
+
 on:
   push:
     branches: [ main ]
@@ -37,7 +42,18 @@ jobs:
           exit 1
         fi
         echo "Build successful: build/gemini-fast.js created"
-    
+
+    - name: Test build execution
+      run: |
+        echo "Testing if build can execute..."
+        node build/gemini-fast.js --version
+        if [ $? -eq 0 ]; then
+          echo "✅ Build execution test passed"
+        else
+          echo "❌ Build execution test failed"
+          exit 1
+        fi
+
     - name: Run tests
       run: npm test
       env:
