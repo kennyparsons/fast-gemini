@@ -12,6 +12,13 @@ Ultra-fast Gemini API proxy with optimized system prompts and minimal overhead. 
 - 🔧 **Customizable** - Override system prompts and configurations
 - 💡 **Lean System Prompts** - Optimized for speed and efficiency
 
+## Versioning
+
+This project mirrors the version of `@google/gemini-cli` it's built from:
+- **Major.Minor** versions match `@google/gemini-cli` (e.g., `0.23.x`)
+- **Patch** versions are independent fixes and improvements to fast-gemini
+- When `@google/gemini-cli` updates to `0.24.0`, fast-gemini will update to `0.24.0`
+
 ## Installation
 
 ### Quick Start (Recommended)
