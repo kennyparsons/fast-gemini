@@ -37,6 +37,6 @@
     "punycode": "^2.3.1"
   },
   "devDependencies": {
-    "@google/gemini-cli": "^0.24.0"
+    "@google/gemini-cli": "^0.23.0"
   }
 }

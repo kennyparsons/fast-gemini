@@ -23,7 +23,7 @@ await esbuild.build({
   target: 'node20',
   outfile: 'build/gemini-fast.js',
   format: 'esm',
-  external: ['fsevents', 'ink', '@google/gemini-cli-core'],
+  external: ['fsevents', 'ink'],
   alias: {
     'punycode': path.resolve(__dirname, 'node_modules/punycode/punycode.js'),
   },
