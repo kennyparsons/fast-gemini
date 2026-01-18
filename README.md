@@ -1,6 +1,8 @@
 # fast-gemini
 
 [![CI](https://github.com/kennyparsons/fast-gemini/actions/workflows/ci.yml/badge.svg)](https://github.com/kennyparsons/fast-gemini/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/kennyparsons/fast-gemini)](https://github.com/kennyparsons/fast-gemini/releases/latest)
+[![npm version](https://img.shields.io/badge/gemini--cli-0.24.0-blue)](https://www.npmjs.com/package/@google/gemini-cli)
 
 Ultra-fast Gemini API proxy with optimized system prompts and minimal overhead. This project bundles the Google Gemini CLI into a single, optimized JavaScript file for faster startup and reduced memory footprint.
 
