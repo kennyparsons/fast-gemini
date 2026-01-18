@@ -1,6 +1,6 @@
 {
   "name": "fast-gemini",
-  "version": "0.24.0",
+  "version": "0.24.1",
   "description": "Ultra-fast Gemini API proxy with optimized system prompts and minimal overhead",
   "main": "build/gemini-fast.js",
   "type": "module",
