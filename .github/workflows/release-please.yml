@@ -1,5 +1,6 @@
 name: Release Please
 
+# Automatically creates release PRs based on conventional commits
 on:
   push:
     branches:
