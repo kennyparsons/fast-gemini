@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GEMINI_CMD="node build/gemini-fast-v3.mjs"
+GEMINI_CMD="node build/gemini-fast.js"
 
 echo "----------------------------------------------------------------"
 echo "Test 1: Simple Hello (Clean Environment)"
