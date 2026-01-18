@@ -14,6 +14,17 @@ Ultra-fast Gemini API proxy with optimized system prompts and minimal overhead. 
 
 ## Installation
 
+### Quick Start (Recommended)
+
+Download the pre-built single-file executable:
+
+```bash
+curl -L -o gemini-fast.js https://github.com/kennyparsons/fast-gemini/releases/latest/download/gemini-fast.js
+node gemini-fast.js "Your prompt here"
+```
+
+**Requirements:** Node.js >= 18.0.0
+
 ### From Source
 
 ```bash
@@ -23,11 +34,9 @@ npm install
 npm run build
 ```
 
-### Prerequisites
-
+**Development Requirements:**
 - Node.js >= 18.0.0
 - npm or yarn
-- Google Gemini CLI installed via Homebrew (for source dependencies)
 
 ## Usage
 
