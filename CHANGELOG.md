@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.23.0](https://github.com/kennyparsons/fast-gemini/compare/v1.1.0...v0.23.0) (2026-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* Version scheme changed from 1.x.x to 0.23.x to mirror @google/gemini-cli
+
+### Features
+
+* mirror @google/gemini-cli version (0.23.x) ([#2](https://github.com/kennyparsons/fast-gemini/issues/2)) ([794e25a](https://github.com/kennyparsons/fast-gemini/commit/794e25a5009b1247fb4fb8b7d7575f820ab63920))
+
 ## [1.1.0](https://github.com/kennyparsons/fast-gemini/compare/v1.0.1...v1.1.0) (2026-01-18)
 
 
