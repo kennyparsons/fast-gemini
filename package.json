@@ -1,6 +1,6 @@
 {
   "name": "fast-gemini",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Ultra-fast Gemini API proxy with optimized system prompts and minimal overhead",
   "main": "build/gemini-fast.js",
   "type": "module",
@@ -37,6 +37,6 @@
     "punycode": "^2.3.1"
   },
   "devDependencies": {
-    "@google/gemini-cli": "~0.23.0"
+    "@google/gemini-cli": "~0.24.0"
   }
 }

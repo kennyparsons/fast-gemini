@@ -238,7 +238,11 @@ function convertSessionToHistoryFormats(messages) {
 
 
 // INLINED runNonInteractive
-async function runNonInteractive({ config, settings, input, prompt_id, hasDeprecatedPromptArg, resumedSessionData, }) {
+async function runNonInteractive(params) {
+    // Wrap config for compatibility with 0.24.0 bundling
+    const config = wrapConfig(params.config);
+    const { settings, input, prompt_id, hasDeprecatedPromptArg, resumedSessionData } = params;
+
     return promptIdContext.run(prompt_id, async () => {
         const consolePatcher = new ConsolePatcher({
             stderr: true,
@@ -559,6 +563,69 @@ async function runNonInteractive({ config, settings, input, prompt_id, hasDeprec
     });
 }
 
+// Config compatibility wrapper for 0.24.0
+// In 0.24.0, esbuild bundling loses the Config class methods, so we need to access properties directly
+function wrapConfig(config) {
+    // If config is not an object, return as-is
+    if (!config || typeof config !== 'object') {
+        return config;
+    }
+
+    // If methods already exist, return as-is
+    if (typeof config.getDebugMode === 'function') {
+        return config;
+    }
+
+    // Use a Proxy to automatically convert getXxx() calls to property access
+    return new Proxy(config, {
+        get(target, prop) {
+            // If the property exists on the target, return it
+            if (prop in target) {
+                const value = target[prop];
+                // Bind functions to the target
+                if (typeof value === 'function') {
+                    return value.bind(target);
+                }
+                return value;
+            }
+
+            // If it's a getXxx method, try to find the corresponding property
+            if (typeof prop === 'string' && prop.startsWith('get')) {
+                // Convert getXxxYyy to xxxYyy
+                const propName = prop.slice(3);
+                const camelPropName = propName.charAt(0).toLowerCase() + propName.slice(1);
+
+                // Special cases for properties that don't follow the pattern
+                if (prop === 'getOutputFormat') {
+                    return () => target.outputSettings?.format || 'text';
+                }
+                if (prop === 'getExtensions') {
+                    return () => target._enabledExtensions || [];
+                }
+                if (prop === 'getApprovalMode') {
+                    return () => target.approvalMode || 'default';
+                }
+
+                // Try the camelCase property name
+                if (camelPropName in target) {
+                    return () => target[camelPropName];
+                }
+
+                // Try with underscore prefix (private properties)
+                const underscorePropName = '_' + camelPropName;
+                if (underscorePropName in target) {
+                    return () => target[underscorePropName];
+                }
+
+                // Return undefined function if property doesn't exist
+                return () => undefined;
+            }
+
+            return undefined;
+        }
+    });
+}
+
 // Helper functions for main
 function validateDnsResolutionOrder(order) {
     const defaultValue = 'ipv4first';
@@ -808,8 +875,12 @@ async function main() {
     // may have side effects.
     {
         const loadConfigHandle = startupProfiler.start('load_cli_config');
-        const config = await myLoadCliConfig(settings.merged, sessionId, argv);
+        let config = await myLoadCliConfig(settings.merged, sessionId, argv);
         loadConfigHandle?.end();
+
+        // Wrap config for compatibility with 0.24.0 bundling
+        config = wrapConfig(config);
+
         // Register config for telemetry shutdown
         // This ensures telemetry (including SessionEnd hooks) is properly flushed on exit
         registerTelemetryConfig(config);
@@ -948,14 +1019,16 @@ async function main() {
 
         const prompt_id = Math.random().toString(16).slice(2);
         logUserPrompt(config, new UserPromptEvent(input.length, prompt_id, config.getContentGeneratorConfig()?.authType, input));
-        const nonInteractiveConfig = await validateNonInteractiveAuth(settings.merged.security?.auth?.selectedType, settings.merged.security?.auth?.useExternal, config, settings);
+        // In 0.24.0, validateNonInteractiveAuth returns the auth type string, not the config
+        // So we just validate but use the original config
+        await validateNonInteractiveAuth(settings.merged.security?.auth?.selectedType, settings.merged.security?.auth?.useExternal, config, settings);
         if (config.getDebugMode()) {
             debugLogger.log('Session ID: %s', sessionId);
         }
         const hasDeprecatedPromptArg = process.argv.some((arg) => arg.startsWith('--prompt'));
         initializeOutputListenersAndFlush();
         await runNonInteractive({
-            config: nonInteractiveConfig,
+            config: config,
             settings,
             input,
             prompt_id,
