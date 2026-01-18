@@ -14,11 +14,14 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+    # Skip CI on main if this is a PR merge (commit message contains "(#")
+    # PRs already run CI, so this avoids duplicate runs
+    if: github.event_name == 'pull_request' || !contains(github.event.head_commit.message, '(#')
+
     strategy:
       matrix:
         node-version: [20.x, 22.x]
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
